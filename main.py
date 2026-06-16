@@ -37,6 +37,7 @@ def root():
 def get_books(
     author: str | None = Query(default=None, description="Filter by author name"),
     genre: str | None = Query(default=None, description="Filter by genre"),
+    search: str | None = Query(default=None, description="Search in title or author"),
 ):
     results = books
 
@@ -45,6 +46,13 @@ def get_books(
 
     if genre:
         results = [b for b in results if genre.lower() in b["genre"].lower()]
+
+    if search:
+        results = [
+            b for b in results
+            if search.lower() in b["title"].lower()
+            or search.lower() in b["author"].lower()
+        ]
 
     return results
 
