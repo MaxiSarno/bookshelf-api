@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel, Field
 
 # Create the FastAPI application instance
@@ -34,8 +34,19 @@ def root():
     return {"message": "Welcome to the Bookshelf API"}
 
 @app.get("/books", response_model=list[Book])
-def get_books():
-    return books
+def get_books(
+    author: str | None = Query(default=None, description="Filter by author name"),
+    genre: str | None = Query(default=None, description="Filter by genre"),
+):
+    results = books
+
+    if author:
+        results = [b for b in results if author.lower() in b["author"].lower()]
+
+    if genre:
+        results = [b for b in results if genre.lower() in b["genre"].lower()]
+
+    return results
 
 @app.get("/books/{book_id}", response_model=Book)
 def get_book(book_id: int):
