@@ -54,3 +54,26 @@ def create_book(book_data: BookCreate):
     books.append(new_book)
     next_id += 1
     return new_book
+
+@app.put("/books/{book_id}", response_model=Book)
+def update_book(book_id: int, book_data: BookCreate):
+    # Loop through books to find the matching ID
+    for i, book in enumerate(books):
+        if book["id"] == book_id:
+            # Replace the old book data with the new data
+            updated_book = {"id": book_id, **book_data.model_dump()}
+            books[i] = updated_book
+            return updated_book
+    # If no book matched, return a 404 error
+    raise HTTPException(status_code=404, detail="Book not found")
+
+@app.delete("/books/{book_id}")
+def delete_book(book_id: int):
+    # Loop through books to find the matching ID
+    for i, book in enumerate(books):
+        if book["id"] == book_id:
+            # Remove the book from the list
+            books.pop(i)
+            return {"message": f"Book {book_id} deleted successfully"}
+    # If no book matched, return a 404 error
+    raise HTTPException(status_code=404, detail="Book not found")
